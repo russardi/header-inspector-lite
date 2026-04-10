@@ -1,102 +1,20 @@
-// All known security headers with metadata
 const SECURITY_HEADERS = [
-  {
-    name: "strict-transport-security",
-    label: "Strict-Transport-Security",
-    category: "Transport Security",
-    required: true,
-    desc: "Forces HTTPS connections (HSTS)",
-  },
-  {
-    name: "content-security-policy",
-    label: "Content-Security-Policy",
-    category: "Content Security",
-    required: true,
-    desc: "Restricts sources of scripts, styles, etc.",
-  },
-  {
-    name: "x-content-type-options",
-    label: "X-Content-Type-Options",
-    category: "Content Security",
-    required: true,
-    desc: "Prevents MIME-type sniffing",
-  },
-  {
-    name: "x-frame-options",
-    label: "X-Frame-Options",
-    category: "Content Security",
-    required: true,
-    desc: "Prevents clickjacking via iframes",
-  },
-  {
-    name: "referrer-policy",
-    label: "Referrer-Policy",
-    category: "Privacy",
-    required: true,
-    desc: "Controls referrer information sent to other sites",
-  },
-  {
-    name: "permissions-policy",
-    label: "Permissions-Policy",
-    category: "Privacy",
-    required: false,
-    desc: "Restricts browser features (camera, mic, geo…)",
-  },
-  {
-    name: "cross-origin-opener-policy",
-    label: "Cross-Origin-Opener-Policy",
-    category: "Isolation",
-    required: false,
-    desc: "Isolates browsing context from cross-origin docs",
-  },
-  {
-    name: "cross-origin-resource-policy",
-    label: "Cross-Origin-Resource-Policy",
-    category: "Isolation",
-    required: false,
-    desc: "Prevents cross-origin no-cors loading of resources",
-  },
-  {
-    name: "cross-origin-embedder-policy",
-    label: "Cross-Origin-Embedder-Policy",
-    category: "Isolation",
-    required: false,
-    desc: "Requires CORP for embedded resources",
-  },
-  {
-    name: "x-xss-protection",
-    label: "X-XSS-Protection",
-    category: "Legacy",
-    required: false,
-    desc: "Legacy XSS protection (deprecated, prefer CSP)",
-  },
-  {
-    name: "cache-control",
-    label: "Cache-Control",
-    category: "Caching",
-    required: false,
-    desc: "Controls HTTP caching behaviour",
-  },
-  {
-    name: "server",
-    label: "Server",
-    category: "Info Disclosure",
-    required: false,
-    desc: "Server software version — ideally not exposed",
-  },
-  {
-    name: "x-powered-by",
-    label: "X-Powered-By",
-    category: "Info Disclosure",
-    required: false,
-    desc: "Tech stack info — should be removed",
-  },
+  { name: "strict-transport-security", label: "Strict-Transport-Security", category: "Transport Security", required: true, desc: "Forces HTTPS connections (HSTS)" },
+  { name: "content-security-policy", label: "Content-Security-Policy", category: "Content Security", required: true, desc: "Restricts sources of scripts, styles, etc." },
+  { name: "x-content-type-options", label: "X-Content-Type-Options", category: "Content Security", required: true, desc: "Prevents MIME-type sniffing" },
+  { name: "x-frame-options", label: "X-Frame-Options", category: "Content Security", required: true, desc: "Prevents clickjacking via iframes" },
+  { name: "referrer-policy", label: "Referrer-Policy", category: "Privacy", required: true, desc: "Controls referrer information sent to other sites" },
+  { name: "permissions-policy", label: "Permissions-Policy", category: "Privacy", required: false, desc: "Restricts browser features (camera, mic, geo…)" },
+  { name: "cross-origin-opener-policy", label: "Cross-Origin-Opener-Policy", category: "Isolation", required: false, desc: "Isolates browsing context from cross-origin docs" },
+  { name: "cross-origin-resource-policy", label: "Cross-Origin-Resource-Policy", category: "Isolation", required: false, desc: "Prevents cross-origin no-cors loading of resources" },
+  { name: "cross-origin-embedder-policy", label: "Cross-Origin-Embedder-Policy", category: "Isolation", required: false, desc: "Requires CORP for embedded resources" },
+  { name: "x-xss-protection", label: "X-XSS-Protection", category: "Legacy", required: false, desc: "Legacy XSS protection (deprecated, prefer CSP)" },
+  { name: "cache-control", label: "Cache-Control", category: "Caching", required: false, desc: "Controls HTTP caching behaviour" },
+  { name: "server", label: "Server", category: "Info Disclosure", required: false, desc: "Server software version — ideally not exposed" },
+  { name: "x-powered-by", label: "X-Powered-By", category: "Info Disclosure", required: false, desc: "Tech stack info — should be removed" },
 ];
 
-// Default settings — all security headers enabled
-const DEFAULT_SETTINGS = {
-  enabledHeaders: SECURITY_HEADERS.map((h) => h.name),
-};
+const DEFAULT_SETTINGS = { enabledHeaders: SECURITY_HEADERS.map((h) => h.name) };
 
 let settings = { ...DEFAULT_SETTINGS };
 let currentData = null;
@@ -105,49 +23,32 @@ let activeTab = "security";
 // ── DOM refs ──────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
 const securityList = $("security-list");
-const allList = $("all-list");
-const urlText = $("url-text");
-const statusBadge = $("status-badge");
-const emptyState = $("empty-state");
-const loadingState = $("loading-state");
-const mainContent = $("main-content");
-const searchInput = $("search-input");
+const allList      = $("all-list");
+const urlText      = $("url-text");
+const statusBadge  = $("status-badge");
+const mainContent  = $("main-content");
+const searchInput  = $("search-input");
 
 // ── Init ──────────────────────────────────────────────────
 async function init() {
-  showLoading(true);
-
-  // Load settings
   const stored = await chrome.storage.sync.get("settings");
   if (stored.settings) settings = { ...DEFAULT_SETTINGS, ...stored.settings };
 
-  // Get current tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) { showEmpty(); return; }
+  if (!tab?.id) return;
 
-  // Request header data from background
-  const data = await new Promise((resolve) => {
-    chrome.runtime.sendMessage({ type: "GET_HEADERS", tabId: tab.id }, (res) => {
-      resolve(res || null);
-    });
-  });
+  const sessionData = await chrome.storage.session.get("tabHeaders");
+  const all = sessionData.tabHeaders ?? {};
+  const data = all[tab.id] ?? null;
 
-  showLoading(false);
-
-  if (!data) {
-    showEmpty();
-    return;
+  if (data) {
+    currentData = data;
+    renderAll(data);
   }
-
-  currentData = data;
-  renderAll(data);
 }
 
 // ── Rendering ─────────────────────────────────────────────
 function renderAll(data) {
-  emptyState.hidden = true;
-  mainContent.hidden = false;
-
   renderUrlBar(data);
   renderScoreBar(data);
   renderSecurityTab(data);
@@ -188,10 +89,7 @@ function renderScoreBar(data) {
     </div>
     <span class="score-value ${grade}">${score}%</span>
   `;
-
-  // Insert after url-bar
-  const urlBar = $("url-bar");
-  urlBar.insertAdjacentElement("afterend", bar);
+  $("url-bar").insertAdjacentElement("afterend", bar);
 }
 
 function renderSecurityTab(data) {
@@ -201,7 +99,6 @@ function renderSecurityTab(data) {
     settings.enabledHeaders.includes(h.name)
   );
 
-  // Group by category
   const categories = {};
   for (const h of filtered) {
     if (!categories[h.category]) categories[h.category] = [];
@@ -220,7 +117,6 @@ function renderSecurityTab(data) {
     for (const h of headers) {
       const value = data.headers[h.name];
       const isPresent = value !== undefined;
-      // Warn for info disclosure headers that ARE present
       const isInfoDisclosure = h.category === "Info Disclosure";
       const indicatorClass = isInfoDisclosure
         ? (isPresent ? "warning" : "present")
@@ -277,21 +173,6 @@ function renderAllTab(data, filter = "") {
   }
 }
 
-// ── State helpers ─────────────────────────────────────────
-function showLoading(visible) {
-  loadingState.hidden = !visible;
-  if (visible) {
-    mainContent.hidden = true;
-    emptyState.hidden = true;
-  }
-}
-
-function showEmpty() {
-  loadingState.hidden = true;
-  mainContent.hidden = true;
-  emptyState.hidden = false;
-}
-
 // ── Event listeners ───────────────────────────────────────
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -309,38 +190,31 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 });
 
 $("btn-refresh").addEventListener("click", async () => {
-  showLoading(true);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (tab?.id) chrome.tabs.reload(tab.id);
-  setTimeout(init, 1500);
+  setTimeout(init, 2000);
 });
 
 searchInput.addEventListener("input", () => {
   if (currentData) renderAllTab(currentData, searchInput.value.trim());
 });
 
-// Copy button handler (event delegation)
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".copy-btn");
   if (!btn) return;
-  const value = btn.dataset.copy;
-  navigator.clipboard.writeText(value).then(() => {
+  navigator.clipboard.writeText(btn.dataset.copy).then(() => {
     btn.classList.add("copied");
     setTimeout(() => btn.classList.remove("copied"), 1500);
   });
 });
 
-// Listen for background updates
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "HEADERS_UPDATED") init();
 });
 
 // ── Utils ─────────────────────────────────────────────────
 function escHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 function escAttr(str) {
   return String(str).replace(/"/g, "&quot;");
