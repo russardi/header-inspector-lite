@@ -6,6 +6,9 @@ A lightweight Chrome extension that captures and displays **HTTP response header
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
+## Demo Video
+
+[![Header Inspector Lite Demo](https://img.youtube.com/vi/rTccdd_h0OA/maxresdefault.jpg)](https://www.youtube.com/watch?v=rTccdd_h0OA)
 ---
 
 ## ✨ Features
