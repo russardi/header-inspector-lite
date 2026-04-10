@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Header Inspector Lite</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="toolbar">
+    <div class="toolbar-left">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <polyline points="8,21 12,17 16,21"/>
+        <path d="M7 8h10M7 11h6"/>
+      </svg>
+      <span class="toolbar-title">Header Inspector</span>
+    </div>
+    <div class="toolbar-right">
+      <button id="btn-refresh" class="icon-btn" title="Refresh headers" aria-label="Refresh headers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+      <a id="btn-settings" href="options.html" target="_blank" class="icon-btn" title="Settings" aria-label="Open settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15 8.6a1.65 1.65 0 0 0 1.82.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 15z"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <div id="tab-bar" class="tab-bar" role="tablist">
+    <button class="tab-btn active" data-tab="security" role="tab" aria-selected="true">Security</button>
+    <button class="tab-btn" data-tab="all" role="tab" aria-selected="false">All Headers</button>
+  </div>
+
+  <div id="url-bar" class="url-bar">
+    <span id="url-text" class="url-text" title=""></span>
+    <span id="status-badge" class="status-badge"></span>
+  </div>
+
+  <main id="main-content">
+    <div id="tab-security" class="tab-panel active">
+      <div id="security-list" class="header-list"></div>
+    </div>
+    <div id="tab-all" class="tab-panel" hidden>
+      <div class="search-bar">
+        <input id="search-input" type="search" placeholder="Filter headers…" aria-label="Filter headers" />
+      </div>
+      <div id="all-list" class="header-list"></div>
+    </div>
+  </main>
+
+  <div id="empty-state" class="empty-state" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <p>No headers captured yet.</p>
+    <p class="empty-hint">Reload the page to capture headers.</p>
+  </div>
+
+  <div id="loading-state" class="empty-state">
+    <div class="spinner"></div>
+    <p>Loading…</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

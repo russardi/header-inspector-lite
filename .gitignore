@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Chrome extension packaging
+*.crx
+*.pem
+*.zip
+
+# Node (if ever used for tooling)
+node_modules/

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Header Inspector Lite — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <polyline points="8,21 12,17 16,21"/>
+        <path d="M7 8h10M7 11h6"/>
+      </svg>
+      <div>
+        <h1>Header Inspector Lite</h1>
+        <p class="header-sub">Settings — choose which security headers appear in the Security tab</p>
+      </div>
+    </header>
+
+    <main>
+      <div class="card">
+        <div class="card-header">
+          <h2>Security Headers</h2>
+          <div class="bulk-actions">
+            <button id="btn-all" class="link-btn">Select All</button>
+            <span class="sep">·</span>
+            <button id="btn-none" class="link-btn">Deselect All</button>
+          </div>
+        </div>
+        <div id="header-groups"></div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <div id="save-status" class="save-status"></div>
+      <button id="btn-reset" class="btn btn-ghost">Reset to defaults</button>
+      <button id="btn-save" class="btn btn-primary">Save settings</button>
+    </footer>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
